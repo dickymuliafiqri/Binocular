@@ -99,7 +99,7 @@ func SubfinderHandler(w http.ResponseWriter, r *http.Request) {
 
 	hxRunner.RunEnumeration()
 
-	tmpl := template.Must(template.ParseFiles("web/index.html"))
+	tmpl := template.Must(template.New("subfinder").Parse(SubfinderTemplate))
 	tmpl.Execute(w, metadata{
 		PageTitle: domain,
 		Result:    result,
