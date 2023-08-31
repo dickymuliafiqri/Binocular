@@ -9,11 +9,11 @@ import (
 	gorillaMux "github.com/gorilla/mux"
 )
 
-func StartWebServer() {
+func StartWebServer() error {
 	mux := gorillaMux.NewRouter()
 
 	mux.HandleFunc("/", subfinder.SubfinderHandler).Methods("GET")
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, mux)
-	http.ListenAndServe(":8080", loggedRouter)
+	return http.ListenAndServe(":8080", loggedRouter)
 }
