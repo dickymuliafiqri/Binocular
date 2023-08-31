@@ -38,7 +38,7 @@ func SubfinderHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Subdomain enumeration
 	subfinderOpts := &runner.Options{
-		Threads:            10,
+		Threads:            50,
 		Timeout:            30,
 		MaxEnumerationTime: 10,
 	}
@@ -68,7 +68,8 @@ func SubfinderHandler(w http.ResponseWriter, r *http.Request) {
 	httpxOpts := httpxRunner.Options{
 		Methods:         "GET",
 		InputTargetHost: strings.Split(output.String(), "\n"),
-		Timeout:         30,
+		Timeout:         10,
+		Threads:         200,
 		OnResult: func(r httpxRunner.Result) {
 			if r.Input != "" {
 				result = append(result, r)
