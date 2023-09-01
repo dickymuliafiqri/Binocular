@@ -1,7 +1,9 @@
 package main
 
-import "github.com/dickymuliafiqri/Binocular/web"
+import (
+	"github.com/dickymuliafiqri/Binocular/api"
+)
 
 func main() {
-	web.StartWebServer()
+	api.StartWebServer()
 }
