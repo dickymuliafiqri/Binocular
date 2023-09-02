@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/projectdiscovery/httpx v1.3.4
 	github.com/projectdiscovery/subfinder/v2 v2.6.2
+	github.com/rs/cors v1.9.0
 	github.com/supabase/postgrest-go v0.0.7
 )
 
