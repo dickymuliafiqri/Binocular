@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"os"
 	"strings"
 	"time"
 
@@ -9,6 +10,10 @@ import (
 )
 
 var Postgrest = PostgrestClass{}
+var (
+	supabaseRestUrl = os.Getenv("SUPABASE_REST_URL")
+	supabaseApiKey  = os.Getenv("SUPABASE_API_KEY")
+)
 
 type PostgrestClass struct {
 	conn *postgrest.Client
@@ -16,8 +21,8 @@ type PostgrestClass struct {
 
 func (c PostgrestClass) Connect() *postgrest.Client {
 	if c.conn == nil {
-		c.conn = postgrest.NewClient("SUPABASE_REST_ENDPOINT", "", map[string]string{
-			"apiKey": "SUPABASE_API_KEY",
+		c.conn = postgrest.NewClient(supabaseRestUrl, "", map[string]string{
+			"apiKey": supabaseApiKey,
 		})
 	}
 
@@ -29,6 +34,7 @@ func (c PostgrestClass) IsLibraryValid(domain string) bool {
 		now    = time.Now()
 		result = LibraryScheme{}
 	)
+
 	libraryData, _, err := c.Connect().From("library").Select("", "", false).Eq("domain", domain).Single().Execute()
 	if err != nil {
 		return false
