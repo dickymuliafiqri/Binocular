@@ -10,7 +10,7 @@
     </div>
     <div class="flex w-[30%] justify-end items-center">
       <a href="https://github.com/dickymuliafiqri/Binocular" target="_blank"
-        ><Icon name="uil:github" color="white" size="1.5em" />
+        ><Icon name="i-mdi-github" color="white" size="1.5em" />
       </a>
     </div>
   </div>

@@ -1,17 +1,25 @@
 <script setup>
+let pending = ref(false);
 let domains = ref([]);
 const inputValue = ref("");
 
 async function getDomainsData() {
   const domain = inputValue.value;
   if (domain != "") {
-    domains.value = await $fetch(`http://127.0.0.1:8080/subfinder?domain=${domain}`).then((data) => {
-      data = JSON.parse(data);
-      for (let i in data.result) {
-        data.result[i].ping = 0;
-      }
-      return data.result;
-    });
+    pending.value = true;
+    domains.value = await $fetch(`http://127.0.0.1:8080/subfinder?domain=${domain}`)
+      .then((data) => {
+        data = JSON.parse(data);
+        for (let i in data.result) {
+          data.result[i].ping = 0;
+        }
+        return data.result.filter((res) => {
+          return res.status_code > 0;
+        });
+      })
+      .finally(() => {
+        pending.value = false;
+      });
   }
 }
 </script>
@@ -24,7 +32,7 @@ async function getDomainsData() {
     </div>
     <div class="mt-5">
       <div class="border rounded border-gray-800 overflow-x-scroll">
-        <Table :domains="domains" :key="domains" />
+        <Table :domains="domains" :pending="pending" :key="pending" />
       </div>
     </div>
   </div>

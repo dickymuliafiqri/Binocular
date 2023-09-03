@@ -1,5 +1,5 @@
 <script setup>
-defineProps(["domains"]);
+let props = defineProps(["pending", "domains"]);
 
 const columns = [
   {
@@ -31,10 +31,30 @@ const columns = [
     label: "Ping",
   },
 ];
+
+function pingTest(id, url) {
+  for (let i in props.domains) {
+    if (props.domains[i].id == id) {
+      let startTime = new Date();
+      $fetch(url, {
+        mode: "no-cors",
+        server: false,
+      })
+        .then(() => {
+          props.domains[i].ping = new Date() - startTime;
+        })
+        .catch(() => {
+          props.domains[i].ping = -1;
+        });
+
+      break;
+    }
+  }
+}
 </script>
 
 <template>
-  <UTable :columns="columns" :rows="domains">
+  <UTable :columns="columns" :rows="domains" :loading="pending" :key="domains">
     <template #domain-data="{ row }">
       <a :href="row.raw.url" target="_blank">{{ row.domain }}</a>
     </template>
@@ -49,17 +69,10 @@ const columns = [
     </template>
     <template #webserver-data="{ row }">
       <UBadge
-        v-if="row.webserver == 'cloudflare'"
+        v-if="row.webserver.toLowerCase() == 'cloudflare' || row.webserver.toLowerCase() == 'cloudfront'"
         :ui="{ rounded: 'rounded-full' }"
         :label="row.webserver"
-        color="orange"
-        variant="subtle"
-      />
-      <UBadge
-        v-else-if="row.webserver == 'CloudFront'"
-        :ui="{ rounded: 'rounded-full' }"
-        :label="row.webserver"
-        color="blue"
+        :color="row.webserver == 'cloudflare' ? 'orange' : 'blue'"
         variant="subtle"
       />
     </template>
@@ -68,31 +81,14 @@ const columns = [
     </template>
     <template #ping-data="{ row }">
       <UButton
-        v-if="row.ping == 0"
-        icon="i-heroicons-arrow-path"
-        size="2xs"
-        color="yellow"
-        variant="outline"
+        :icon="row.ping == 0 ? 'i-heroicons-arrow-path' : row.ping < 0 ? 'i-heroicons-x-mark' : null"
+        :label="row.ping > 0 ? row.ping + 'ms' : null"
+        :color="row.ping == 0 ? 'yellow' : row.ping > 0 ? 'green' : 'red'"
         :ui="{ rounded: 'rounded-full' }"
-        square
-      />
-      <UButton
-        v-else-if="row.ping > 0"
-        :label="row.ping + 'ms'"
         size="2xs"
-        color="green"
         variant="outline"
-        :ui="{ rounded: 'rounded-full' }"
         square
-      />
-      <UButton
-        v-else
-        icon="i-heroicons-x-mark"
-        size="2xs"
-        color="red"
-        variant="outline"
-        :ui="{ rounded: 'rounded-full' }"
-        square
+        @click="pingTest(row.id, row.raw.url)"
       />
     </template>
   </UTable>
