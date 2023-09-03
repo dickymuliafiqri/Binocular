@@ -1,20 +1,24 @@
-FROM node:lts
+FROM node:lts as ui
 
-ENV WORKDIR /usr/src/binocular
-ENV WEBROOT /var/www/html
-
-WORKDIR ${WORKDIR}
-
-RUN apt-get update
-RUN apt -y install golang
+WORKDIR /usr/src/ui
 
 RUN git clone https://github.com/dickymuliafiqri/Binocular .
-RUN cd ${WORKDIR}/web && npm install && npm run generate && cp -r .output/public/* ${WEBROOT}
+RUN cd ./web && npm install && npm run generate
 
-RUN cd ${WORKDIR} && go mod download && go mod tidy && go mod verify
+
+FROM golang:latest
+
+WORKDIR /usr/src/api
+
+RUN mkdir -p /var/www/html
+
+COPY --from=ui /usr/src/ui/web/.output/public/* /var/www/html
+
+RUN git clone https://github.com/dickymuliafiqri/Binocular .
+RUN go mod download && go mod tidy && go mod download
 RUN go build -o /usr/local/bin/binocular ./cmd/binocular/main.go
 RUN rm -rf *
 
 EXPOSE 8080
 
-CMD ["binocular"]
+CMD ["/usr/local/bin/binocular"]
