@@ -2,12 +2,13 @@
 let pending = ref(false);
 let domains = ref([]);
 const inputValue = ref("");
+const appConfig = useAppConfig();
 
 async function getDomainsData() {
   const domain = inputValue.value;
   if (domain != "") {
     pending.value = true;
-    domains.value = await $fetch(`http://127.0.0.1:8080/subfinder?domain=${domain}`)
+    domains.value = await $fetch(`${appConfig.binocularRestApi}?domain=${domain}`)
       .then((data) => {
         let sortable = [];
 

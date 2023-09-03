@@ -39,9 +39,9 @@ const columns = [
   },
 ];
 
-function pingTest(id, url) {
+function pingTest(url) {
   for (let i in props.domains) {
-    if (props.domains[i].id == id) {
+    if (props.domains[i].raw.url == url) {
       let startTime = new Date();
       $fetch(url, {
         mode: "no-cors",
@@ -96,7 +96,7 @@ function pingTest(id, url) {
           size="2xs"
           variant="outline"
           square
-          @click="pingTest(row.id, row.raw.url)"
+          @click="pingTest(row.raw.url)"
         />
       </UTooltip>
     </template>
