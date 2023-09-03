@@ -1,6 +1,13 @@
 <script setup>
 let props = defineProps(["pending", "domains"]);
 
+const page = ref(1);
+const listPerPage = 10;
+
+const data = computed(() => {
+  return props.domains.slice((page.value - 1) * listPerPage, page.value * listPerPage);
+});
+
 const columns = [
   {
     key: "domain",
@@ -54,7 +61,7 @@ function pingTest(id, url) {
 </script>
 
 <template>
-  <UTable :columns="columns" :rows="domains" :loading="pending" :key="domains">
+  <UTable :columns="columns" :rows="data" :loading="pending" :key="data">
     <template #domain-data="{ row }">
       <a :href="row.raw.url" target="_blank">{{ row.domain }}</a>
     </template>
@@ -80,16 +87,52 @@ function pingTest(id, url) {
       <a :href="'http://' + row.host" target="_blank">{{ row.host }}</a>
     </template>
     <template #ping-data="{ row }">
-      <UButton
-        :icon="row.ping == 0 ? 'i-heroicons-arrow-path' : row.ping < 0 ? 'i-heroicons-x-mark' : null"
-        :label="row.ping > 0 ? row.ping + 'ms' : null"
-        :color="row.ping == 0 ? 'yellow' : row.ping > 0 ? 'green' : 'red'"
-        :ui="{ rounded: 'rounded-full' }"
-        size="2xs"
-        variant="outline"
-        square
-        @click="pingTest(row.id, row.raw.url)"
-      />
+      <UTooltip text="Ping Test">
+        <UButton
+          :icon="row.ping == 0 ? 'i-heroicons-arrow-path' : row.ping < 0 ? 'i-heroicons-x-mark' : null"
+          :label="row.ping > 0 ? row.ping + 'ms' : null"
+          :color="row.ping == 0 ? 'yellow' : row.ping > 0 ? 'green' : 'red'"
+          :ui="{ rounded: 'rounded-full' }"
+          size="2xs"
+          variant="outline"
+          square
+          @click="pingTest(row.id, row.raw.url)"
+        />
+      </UTooltip>
     </template>
   </UTable>
+  <div class="flex w-full justify-end my-3 px-5">
+    <UPagination
+      v-model="page"
+      :page-count="listPerPage"
+      :total="domains.length"
+      :ui="{ rounded: 'first-of-type:rounded-s-md last-of-type:rounded-e-md' }"
+      color="black"
+      size="xs"
+    >
+      <template #prev="{ onClick }">
+        <UTooltip text="Previous page">
+          <UButton
+            icon="i-heroicons-arrow-small-left-20-solid"
+            color="primary"
+            :ui="{ rounded: 'rounded-full' }"
+            class="rtl:[&_span:first-child]:rotate-180 me-2"
+            @click="onClick"
+            size="2xs"
+          />
+        </UTooltip>
+      </template>
+      <template #next="{ onClick }">
+        <UTooltip text="Next page">
+          <UButton
+            icon="i-heroicons-arrow-small-right-20-solid"
+            color="primary"
+            :ui="{ rounded: 'rounded-full' }"
+            class="rtl:[&_span:last-child]:rotate-180 ms-2"
+            @click="onClick"
+            size="2xs"
+          />
+        </UTooltip> </template
+    ></UPagination>
+  </div>
 </template>

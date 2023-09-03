@@ -9,13 +9,20 @@ async function getDomainsData() {
     pending.value = true;
     domains.value = await $fetch(`http://127.0.0.1:8080/subfinder?domain=${domain}`)
       .then((data) => {
+        let sortable = [];
+
         data = JSON.parse(data);
         for (let i in data.result) {
           data.result[i].ping = 0;
+
+          if (data.result[i].status_code > 0) {
+            sortable.unshift(data.result[i]);
+          } else {
+            sortable.push(data.result[i]);
+          }
         }
-        return data.result.filter((res) => {
-          return res.status_code > 0;
-        });
+
+        return sortable;
       })
       .finally(() => {
         pending.value = false;
@@ -26,7 +33,7 @@ async function getDomainsData() {
 
 <template>
   <div class="flex flex-col w-full pt-6">
-    <div class="flex justify-center w-full text-gray-300">
+    <div class="flex justify-left w-full text-gray-300">
       <UInput v-model="inputValue" placeholder="Search..." variant="none" />
       <UButton icon="i-heroicons-magnifying-glass-solid" :ui="{ rounded: 'rounded-full' }" @click="getDomainsData" />
     </div>
