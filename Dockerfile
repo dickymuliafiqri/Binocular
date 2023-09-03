@@ -5,10 +5,8 @@ ENV WEBROOT /var/www/html
 
 WORKDIR ${WORKDIR}
 
-RUN curl -Lo go.tar.gz "https://go.dev/dl/go1.21.0.linux-amd64.tar.gz"
-RUN tar -C /usr/local -xzf go.tar.gz 
-RUN rm go.tar.gz
-RUN echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc && source ~/.bashrc
+RUN apt-get update
+RUN apt -y install golang
 
 RUN git clone https://github.com/dickymuliafiqri/Binocular .
 RUN cd ${WORKDIR}/web && npm install && npm run generate && cp -r .output/public/* ${WEBROOT}
